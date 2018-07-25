@@ -20,13 +20,19 @@ This Archetype is developed in Java and is built using Maven 3+, To build issue 
 mvn clean install
 ```  
 
-To also sign the resulting artefacts use the `sign-artifacts` profile as follows (you can optionally specify the 
-key to use for signing through the system property `gpg.keyname`).
+To perform a release and deploy to the Central Repository the profile `release` needs to be specified:
 
 ```
-mvn clean install -P sign-artifacts
+mvn clean install -P release
 ``` 
 
+This profile triggers in addition the following:
+* Generation of the source JAR.
+* Generation of the Javadocs.
+* PGP signature of all artefacts. To do this you need a GPG local installation. In addition if multiple keys are
+  defined you can specify the appropriate one using the `gpg.keyname` system property (either on the command line or
+  in `settings.xml`).  
+* Deploy to the Central repository's staging environment and automatically promote the release.
 
 Using the Archetype to generate a new project is through [Maven's Archetype Plugin](https://maven.apache.org/archetype/maven-archetype-plugin/index.html).
 To use it issue (replacing `VERSION` with the version you want to use):
