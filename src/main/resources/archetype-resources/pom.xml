@@ -1,3 +1,4 @@
+#set($dollar = '$')
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -29,12 +30,12 @@
         <dependency>
             <groupId>eu.europa.ec.itb</groupId>
             <artifactId>gitb-types</artifactId>
-            <version>${com.gitb.version}</version>
+            <version>${dollar}{com.gitb.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
-            <version>${org.apache.cxf.version}</version>
+            <version>${dollar}{org.apache.cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -65,11 +66,11 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>${com.spotify.dockerfile-maven-plugin.version}</version>
+                <version>${dollar}{com.spotify.dockerfile-maven-plugin.version}</version>
                 <configuration>
-                    <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                    <repository>${dollar}{docker.image.prefix}/${dollar}{project.artifactId}</repository>
                     <buildArgs>
-                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+                        <JAR_FILE>target/${dollar}{project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
                 </configuration>
             </plugin>
