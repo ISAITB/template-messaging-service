@@ -1,3 +1,4 @@
+#set($dollar = '$')
 package ${package}.gitb;
 
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
@@ -12,28 +13,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProxyInfo {
 
-    @Value("${proxy.enabled:false}")
+    @Value("${dollar}{proxy.enabled:false}")
     private boolean enabled;
 
-    @Value("${proxy.server:''}")
+    @Value("${dollar}{proxy.server:''}")
     private String server;
 
-    @Value("${proxy.port:null}")
+    @Value("${dollar}{proxy.port:-1}")
     private Integer port;
 
-    @Value("${proxy.type:'HTTP'}")
+    @Value("${dollar}{proxy.type:'HTTP'}")
     private String type;
 
-    @Value("${proxy.auth.enabled:false}")
+    @Value("${dollar}{proxy.auth.enabled:false}")
     private boolean authEnabled;
 
-    @Value("${proxy.auth.username:''}")
+    @Value("${dollar}{proxy.auth.username:''}")
     private String username;
 
-    @Value("${proxy.auth.password:''}")
+    @Value("${dollar}{proxy.auth.password:''}")
     private String password;
 
-    @Value("${proxy.nonProxyHosts:''}")
+    @Value("${dollar}{proxy.nonProxyHosts:''}")
     private String nonProxyHosts;
 
     /**

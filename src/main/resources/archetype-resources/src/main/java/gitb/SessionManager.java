@@ -39,13 +39,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionManager {
 
     /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(eu.europa.ec.itb.gitb.SessionManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SessionManager.class);
 
     /** The map of in-memory active sessions. */
     private Map<String, Map<String, Object>> sessions = new ConcurrentHashMap<>();
 
     @Autowired
-    private eu.europa.ec.itb.gitb.ProxyInfo proxy = null;
+    private ProxyInfo proxy = null;
 
     /**
      * Create a new session.
