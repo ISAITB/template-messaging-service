@@ -1,14 +1,18 @@
 package ${package}.gitb;
 
-import com.gitb.ms.MessagingClientService;
+import com.gitb.ms.MessagingClient;
 import com.gitb.ms.NotifyForMessageRequest;
 import com.gitb.tr.TAR;
 import com.gitb.tr.TestResultType;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +28,12 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * This implementation stores session information in memory. An alternative solution
  * that would be fault-tolerant could store test session data in a DB.
+ *
+ * This class also holds the implementation responsible for notifying the test bed for
+ * received messages. This is done via the test bed's call-back service interface. Apache
+ * CXF is used for this for maximum flexibility. As an example, the configuration of
+ * a proxy to be used for this call is provided that can be optionally set on the call-back
+ * service proxy via configuration properties (set in application.properties).
  */
 @Component
 public class SessionManager {
@@ -33,6 +43,9 @@ public class SessionManager {
 
     /** The map of in-memory active sessions. */
     private Map<String, Map<String, Object>> sessions = new ConcurrentHashMap<>();
+
+    @Autowired
+    private ProxyInfo proxy = null;
 
     /**
      * Create a new session.
@@ -102,31 +115,49 @@ public class SessionManager {
      * @param report The report to notify the test bed with.
      */
     public void notifyTestBed(String sessionId, TAR report){
-        MessagingClientService client;
         String callback = (String)getSessionInfo(sessionId, SessionData.CALLBACK_URL);
         if (callback == null) {
             LOG.warn("Could not find callback URL for session [{}]", sessionId);
         } else {
             try {
-                client = new MessagingClientService(new URI(callback).toURL());
+                LOG.info("Notifying test bed for session [{}]", sessionId);
+                callTestBed(sessionId, report, callback);
             } catch (Exception e) {
-                throw new IllegalStateException("Unable to call callback URL ["+callback+"] for session ["+sessionId+"]", e);
-            }
-            try {
-                NotifyForMessageRequest request = new NotifyForMessageRequest();
-                request.setSessionId(sessionId);
-                request.setReport(report);
-                client.getMessagingClientPort().notifyForMessage(request);
-                LOG.info("Notified test bed for session [{}]", sessionId);
-            } catch (Exception e) {
-                NotifyForMessageRequest request = new NotifyForMessageRequest();
-                request.setSessionId(sessionId);
-                request.setReport(Utils.createReport(TestResultType.FAILURE));
-                client.getMessagingClientPort().notifyForMessage(request);
                 LOG.warn("Error while notifying test bed for session [{}]", sessionId, e);
+                callTestBed(sessionId, Utils.createReport(TestResultType.FAILURE), callback);
                 throw new IllegalStateException(e);
             }
         }
+    }
+
+    /**
+     * Call the test bed to notify it of received communication.
+     *
+     * @param sessionId The session ID that this notification relates to.
+     * @param report The TAR report to send back.
+     * @param callbackAddress The address on which the call is to be made.
+     */
+    private void callTestBed(String sessionId, TAR report, String callbackAddress) {
+        /*
+         * First setup the service client. This is not created once and reused since the address to call
+         * is determined dynamically from the WS-Addressing information (passed here as the callback address).
+         */
+        JaxWsProxyFactoryBean proxyFactoryBean = new JaxWsProxyFactoryBean();
+        proxyFactoryBean.setServiceClass(MessagingClient.class);
+        proxyFactoryBean.setAddress(callbackAddress);
+        MessagingClient serviceProxy = (MessagingClient)proxyFactoryBean.create();
+        Client client = ClientProxy.getClient(serviceProxy);
+        HTTPConduit httpConduit = (HTTPConduit) client.getConduit();
+        httpConduit.getClient().setAutoRedirect(true);
+        // Apply proxy settings (if applicable).
+        if (proxy.isEnabled()) {
+            proxy.applyToCxfConduit(httpConduit);
+        }
+        // Make the call.
+        NotifyForMessageRequest request = new NotifyForMessageRequest();
+        request.setSessionId(sessionId);
+        request.setReport(report);
+        serviceProxy.notifyForMessage(request);
     }
 
     /**
