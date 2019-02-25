@@ -22,7 +22,7 @@ ${hash} Building and running
 1. Build using `mvn clean package`.
 2. Once built you can run the application in two ways:  
   a. With maven: `mvn spring-boot:run`.  
-  b. Standalone: `java -jar .\target\${artifactId}-VERSION.jar`.
+  b. Standalone: `java -jar ./target/${artifactId}-VERSION.jar`.
 3. The service's WSDL file is accessible at http://localhost:8080/services/messaging?WSDL.
 
 ${hash}${hash} Live reload for development
