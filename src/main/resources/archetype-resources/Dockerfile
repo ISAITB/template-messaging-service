@@ -1,5 +1,5 @@
 #set($dollar = '$')
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11-jre
 VOLUME /tmp
 ARG JAR_FILE
 COPY ${dollar}{JAR_FILE} app.jar
