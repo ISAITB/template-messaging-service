@@ -14,8 +14,8 @@ built and packaged using [Apache Maven](https://maven.apache.org/).
 ${hash} Prerequisites
 
 The following prerequisites are required:
-* To build: JDK 8+, Maven 3.2+.
-* To run: JRE 8+.
+* To build: JDK 11+, Maven 3.2+.
+* To run: JRE 11+.
 
 ${hash} Building and running
 
