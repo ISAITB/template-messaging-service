@@ -7,15 +7,15 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.3.RELEASE</version>
+        <version>2.4.2</version>
     </parent>
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
     <properties>
         <!-- Dependency and plugin versions. -->
-        <com.gitb.version>1.11.1</com.gitb.version>
-        <org.apache.cxf.version>3.4.0</org.apache.cxf.version>
+        <com.gitb.version>1.12.0</com.gitb.version>
+        <org.apache.cxf.version>3.4.2</org.apache.cxf.version>
         <com.spotify.dockerfile-maven-plugin.version>1.4.12</com.spotify.dockerfile-maven-plugin.version>
         <!-- Other properties. -->
         <docker.image.prefix>local</docker.image.prefix>
