@@ -1,7 +1,1 @@
-# Overview
-
-The [Interoperability Test Bed](https://joinup.ec.europa.eu/collection/interoperability-test-bed-repository/solution/interoperability-test-bed) is pleased to announce the latest release of the template GITB messaging service archetype.
-
-# Change Log
-
-For the latest changes incorporated into the archetype's definition check the [change history section](https://www.itb.ec.europa.eu/docs/services/latest/changelog/) of the [GITB test services documentation](https://www.itb.ec.europa.eu/docs/services/latest/).
+The [Interoperability Test Bed](https://joinup.ec.europa.eu/collection/interoperability-test-bed-repository/solution/interoperability-test-bed) is pleased to announce the latest release of the template **GITB messaging service archetype**. For the latest changes incorporated into the archetype's definition check the [change history section](https://www.itb.ec.europa.eu/docs/services/latest/changelog/) of the [GITB test services documentation](https://www.itb.ec.europa.eu/docs/services/latest/).
