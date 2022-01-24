@@ -6,7 +6,7 @@
 
   <groupId>eu.europa.ec.itb</groupId>
   <artifactId>template-messaging-service</artifactId>
-  <version>1.15.0</version>
+  <version>1.15.1</version>
   <packaging>maven-archetype</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -22,10 +22,10 @@
 
   <developers>
     <developer>
-      <name>European Commission, DIGIT, ISA2 Unit</name>
+      <name>European Commission, DIGIT</name>
       <email>DIGIT-ITB@ec.europa.eu</email>
       <organization>European Commission</organization>
-      <organizationUrl>https://ec.europa.eu/isa2/</organizationUrl>
+      <organizationUrl>https://ec.europa.eu/info/departments/informatics_en</organizationUrl>
     </developer>
   </developers>
 
