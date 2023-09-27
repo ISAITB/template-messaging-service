@@ -14,9 +14,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
+import jakarta.xml.ws.WebServiceContext;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceContext;
 import java.util.ArrayList;
 import java.util.List;
 
