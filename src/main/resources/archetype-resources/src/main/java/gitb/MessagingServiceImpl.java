@@ -19,6 +19,7 @@ import jakarta.xml.ws.WebServiceContext;
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Spring component that realises the messaging service.
@@ -29,7 +30,9 @@ public class MessagingServiceImpl implements MessagingService {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(MessagingServiceImpl.class);
     /** The name of the WS-Addressing ReplyTo field. */
-    private static QName REPLY_TO_QNAME = new AddressingConstants().getReplyToQName();
+    private static final QName REPLY_TO_QNAME = new AddressingConstants().getReplyToQName();
+    /** The name of the test session header value. */
+    private static final QName TEST_SESSION_ID_QNAME = new QName("http://www.gitb.com", "TestSessionIdentifier", "gitb");
 
     /** The name of the input parameter for the message received from the test bed. */
     public static final String INPUT__MESSAGE = "messageToSend";
@@ -56,12 +59,18 @@ public class MessagingServiceImpl implements MessagingService {
      *     <li>The message to send (string).</li>
      *     <li>The message received (string).</li>
      * </ul>
-     * Note that defining output messages is optional as any and all output will be send back to the test bed regardless.
-     * It is important however to define all expected inputs here as these are checked by the test bed before making the
-     * actual call. Typically all such inputs need to be defined as optional considering that they apply both to the send
-     * and receive operations which would likely not require the same inputs. The reason for this was to support inputs
-     * for the receive operation but maintain backwards compatibility for existing services. As such, it is best to
-     * define all input as optional and simply check them as part of the send and/or receive logic.
+     * Note that defining the implementation of this service is optional. If the service is not going to be published
+     * for third parties to use in other test bed instances, you can simple define an empty implementation as follows:
+     * <pre>
+     * public GetModuleDefinitionResponse getModuleDefinition(Void parameters) {
+     *     return new GetModuleDefinitionResponse();
+     * }
+     * </pre>
+     *
+     * In case you choose to implement this service, note that the outputs definition is optional as all outputs will
+     * be sent back to the test bed regardless. Regarding inputs you may need to define them as optional if these
+     * vary depending on the action you plan on taking. Even if an input is defined as optional, you can always check
+     * in your send/receive implementation to see if it was provided depending on the action to take place.
      *
      * @param parameters No parameters are expected.
      * @return The response.
@@ -85,7 +94,7 @@ public class MessagingServiceImpl implements MessagingService {
      *
      * This call expects from the service to do the following:
      * <ul>
-     *     <li>Generate and store a session identifier to keep track of messages linked to the test session.</li>
+     *     <li>Record the session identifier to keep track of messages linked to the test session.</li>
      *     <li>Process, if needed, the configuration provided by the SUT.</li>
      *     <li>Return, if needed, configuration to be displayed to the user for the SUT actor.</li>
      * </ul>
@@ -97,9 +106,10 @@ public class MessagingServiceImpl implements MessagingService {
     public InitiateResponse initiate(InitiateRequest parameters) {
         InitiateResponse response = new InitiateResponse();
         // Get the ReplyTo address for the test bed callbacks based on WS-Addressing.
-        String replyToAddress = getReplyToAddress();
-        String sessionId = sessionManager.createSession(replyToAddress);
-        response.setSessionId(sessionId);
+        String replyToAddress = getHeaderAsString(REPLY_TO_QNAME);
+        // Get the test session ID to use for tracking session state.
+        String sessionId = getHeaderAsString(TEST_SESSION_ID_QNAME);
+        sessionManager.createSession(sessionId, replyToAddress);
         LOG.info("Initiated a new session [{}] with callback address [{}]", sessionId, replyToAddress);
         return response;
     }
@@ -209,22 +219,28 @@ public class MessagingServiceImpl implements MessagingService {
     }
 
     /**
-     * Get the test bed address to reply to.
+     * Extract a value from the SOAP headers.
      *
-     * @return The address.
+     * @param name The name of the header to locate.
+     * @param valueExtractor The function used to extract the data.
+     * @return The extracted data.
+     * @param <T> The type of data extracted.
      */
-    private String getReplyToAddress() {
-        List<Header> headers = (List<Header>) wsContext.getMessageContext().get(Header.HEADER_LIST);
-        for (Header header: headers) {
-            if (header.getName().equals(REPLY_TO_QNAME)) {
-                String replyToAddress = ((Element)header.getObject()).getTextContent().trim();
-                if (!replyToAddress.toLowerCase().endsWith("?wsdl")) {
-                    replyToAddress += "?wsdl";
-                }
-                return replyToAddress;
-            }
-        }
-        return null;
+    private <T> T getHeaderValue(QName name, Function<Header, T> valueExtractor) {
+        return ((List<Header>) wsContext.getMessageContext().get(Header.HEADER_LIST))
+                .stream()
+                .filter(header -> name.equals(header.getName())).findFirst()
+                .map(valueExtractor).orElse(null);
+    }
+
+    /**
+     * Get the specified header element as a string.
+     *
+     * @param name The name of the header element to lookup.
+     * @return The text value of the element.
+     */
+    private String getHeaderAsString(QName name) {
+        return getHeaderValue(name, (header) -> ((Element) header.getObject()).getTextContent().trim());
     }
 
 }

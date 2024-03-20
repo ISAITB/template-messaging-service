@@ -42,7 +42,7 @@ public class SessionManager {
     private static final Logger LOG = LoggerFactory.getLogger(SessionManager.class);
 
     /** The map of in-memory active sessions. */
-    private Map<String, Map<String, Object>> sessions = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, Object>> sessions = new ConcurrentHashMap<>();
 
     @Autowired
     private ProxyInfo proxy = null;
@@ -50,14 +50,17 @@ public class SessionManager {
     /**
      * Create a new session.
      *
+     * @param sessionId The session ID to use (if null a new one will be generated).
      * @param callbackURL The callback URL to set for this session.
-     * @return The session ID that was generated.
+     * @return The session ID that was generated (generated if not provided).
      */
-    public String createSession(String callbackURL) {
+    public String createSession(String sessionId, String callbackURL) {
         if (callbackURL == null) {
             throw new IllegalArgumentException("A callback URL must be provided");
         }
-        String sessionId = UUID.randomUUID().toString();
+        if (sessionId == null) {
+            sessionId = UUID.randomUUID().toString();
+        }
         Map<String, Object> sessionInfo = new HashMap<>();
         sessionInfo.put(SessionData.CALLBACK_URL, callbackURL);
         sessions.put(sessionId, sessionInfo);
