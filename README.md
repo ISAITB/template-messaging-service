@@ -1,5 +1,13 @@
 [![Maven Central](https://img.shields.io/maven-central/v/eu.europa.ec.itb/gitb-types.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22eu.europa.ec.itb%22%20AND%20a:%22template-messaging-service%22)
 
+> **Note**  
+> 
+> As of release 1.22.0 you should use the [template-test-service](https://github.com/ISAITB/template-test-service) archetype
+> to generate test services. This archetype allows you to create one or more service endpoints in a single app with additional
+> configuration options.
+> 
+> For more information see the [template services documentation](https://www.itb.ec.europa.eu/docs/services/latest/templates/).
+
 # Introduction
 
 The **template-messaging-service** is a [Maven Archetype](https://maven.apache.org/guides/introduction/introduction-to-archetypes.html) 
